@@ -9,6 +9,7 @@ void Commander::init_members()
     this->set_heating_cb          = default_handler_data;
     this->read_extrusion_speed_cb = default_handler_void;
     this->read_temperature_cb     = default_handler_void;
+    this->blink_debug_led_cb      = default_handler_void;
 
     this->enabled = false;
 
@@ -31,7 +32,7 @@ Commander::Commander(HardwareSerial* serial_ptr)
     this->init_members();
 }
 
-#define STD_SERIAL              Serial2
+#define STD_SERIAL              Serial
 #define STD_SERIAL_BAUD_RATE    9600
 #define STD_SERIAL_CONFIG       SERIAL_8N1
 
@@ -101,9 +102,12 @@ void Commander::execute_cmd()
         break;*/
 
     case MSG_BLINK_DEBUG_LED:
+        this->sr->println("exec blink");
         this->blink_debug_led_cb();
+        break;
 
     default:
+        this->sr->println("exc_cmd error!");
         /* Should not hit. Silently ignore. */
         break;
     }
@@ -120,12 +124,12 @@ void Commander::process_byte()
         switch (this->cmd_code)
         {
         case MSG_SET_EXTRUSION_SPEED:
-            this->numBytesTot  = 3;
+            this->numBytesTot  = 5;
             this->numBytesRcvd = 1;
             break;
 
         case MSG_SET_HEATING:
-            this->numBytesTot  = 3;
+            this->numBytesTot  = 5;
             this->numBytesRcvd = 1;
             break;
 
@@ -147,9 +151,12 @@ void Commander::process_byte()
 
         case MSG_BLINK_DEBUG_LED:
             this->numBytesRcvd = 1;
+            break;
 
         default:
             timesInvalidCmdRcvd = timesInvalidCmdRcvd + 1;
+            this->sr->println("proc_byte error!");
+            this->sr->println(this->cmd_code, DEC);
             break;
         }
     }
@@ -182,6 +189,7 @@ void Commander::process_incomming()
 
     while (this->sr->available() > 0)
     {
+        this->sr->println("byte rcvd!");
         this->process_byte();
     }
 

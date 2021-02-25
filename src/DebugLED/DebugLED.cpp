@@ -2,6 +2,8 @@
 
 void LED_startup_blink(byte led_pin)
 {
+    pinMode(led_pin, OUTPUT);
+
     digitalWrite(led_pin, HIGH);
     delay(500);
     digitalWrite(led_pin, LOW);
@@ -11,11 +13,14 @@ void LED_startup_blink(byte led_pin)
     digitalWrite(led_pin, LOW);
     delay(500);
 
+    pinMode(led_pin, INPUT);
     return;
 }
 
 void LED_init_done_blink(byte led_pin)
 {
+    pinMode(led_pin, OUTPUT);
+
     digitalWrite(led_pin, HIGH);
     delay(250);
     digitalWrite(led_pin, LOW);
@@ -33,6 +38,7 @@ void LED_init_done_blink(byte led_pin)
     digitalWrite(led_pin, LOW);
     delay(250);
     
+    pinMode(led_pin, INPUT);
     return;
 }
 
@@ -44,8 +50,22 @@ byte counter_m = 0;
 
 void LED_debug_blink(byte led_pin)
 {
+    if (blink_ones_m == true)
+    {
+        return;
+    }
     blink_ones_m = true;
     blink_ones_led_pin = led_pin;
+
+    pinMode(blink_ones_led_pin, OUTPUT);
+    return;
+}
+
+void stop_debug_blink()
+{
+    blink_ones_m = false;
+    counter_m = 0;
+    pinMode(blink_ones_led_pin, INPUT);
     return;
 }
 
@@ -65,7 +85,7 @@ void LED_process()
             
             case 10:
                 digitalWrite(blink_ones_led_pin, LOW);
-                blink_ones_m = false;
+                stop_debug_blink();
                 break;
 
             default:
@@ -76,6 +96,5 @@ void LED_process()
         
         next_process_time_m = time + (unsigned long)(1000.0/PROCESS_LED_FREQ);
     }
-    return;
     return;
 }
