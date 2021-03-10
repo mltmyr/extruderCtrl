@@ -23,7 +23,7 @@ public:
         this->x0 = x0;
         this->t0 = t0;
 
-        this->t1 = (unsigned long)((this->x1 - this->x0)/(this->a_max)) + this->t0;
+        this->t1 = (unsigned long)(abs(this->x1 - this->x0)/(this->a_max)) + this->t0;
     }
 
     float getVal(unsigned long t)
@@ -35,7 +35,7 @@ public:
         }
         else
         {
-            out = (this->x0 + (this->a_max)*(t - this->t0));
+            out = (this->x0)*(this->t1 - t)/(this->t1 - this->t0) + (this->x1)*(t - this->t0)/(this->t1 - this->t0);
         }
         return out;
     }
