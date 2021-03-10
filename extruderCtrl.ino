@@ -138,6 +138,8 @@ void setup()
   cmdr_ptr->enable();
   /* ======== */
 
+  stepper_setSteppingFrequency(-1.0);
+
   LED_init_done_blink(LED_PIN);
   Serial.println("Setup done!");
 }

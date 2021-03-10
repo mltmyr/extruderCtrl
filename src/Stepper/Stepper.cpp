@@ -17,7 +17,7 @@ public:
 
     ~Ramper() {}
 
-    void targetChanged(word r, word x0, unsigned long t0)
+    void targetChanged(float r, float x0, unsigned long t0)
     {
         this->x1 = r;
         this->x0 = x0;
@@ -31,11 +31,11 @@ public:
         float out;
         if (t >= this->t1)
         {
-            out = (word)(this->x1);
+            out = (this->x1);
         }
         else
         {
-            out = (word)(this->x0 + (this->a_max)*(t - this->t0));
+            out = (this->x0 + (this->a_max)*(t - this->t0));
         }
         return out;
     }
@@ -313,11 +313,11 @@ void stepper_setSteppingFrequency(float step_freq)
         return;
     }
 
-    if (targetSteppingFreq_m >= STEP_FREQ_SIG_MAX)
+    if (step_freq >= STEP_FREQ_SIG_MAX)
     {
         targetSteppingFreq_m = STEP_FREQ_SIG_MAX;
     }
-    else if (targetSteppingFreq_m <= STEP_FREQ_SIG_MIN)
+    else if (step_freq <= STEP_FREQ_SIG_MIN)
     {
         targetSteppingFreq_m = STEP_FREQ_SIG_MIN;
     }
