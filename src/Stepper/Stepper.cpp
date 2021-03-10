@@ -60,7 +60,7 @@ boolean stepper_is_initialized_m = false;
 byte enable_pin_m;
 byte   step_pin_m;
 byte    dir_pin_m;
-
+boolean current_step_state_m;
 float   targetSteppingFreq_m;
 float   steppingFreq_m;
 
@@ -124,6 +124,7 @@ void stepper_init(byte step_pin, byte dir_pin, byte enable_pin, float process_fr
     enable_pin_m = enable_pin;
     step_pin_m   = step_pin;
     dir_pin_m    = dir_pin;
+    current_step_state_m = digitalRead(step_pin_m);
     
     targetSteppingFreq_m = 0;
     steppingFreq_m       = 0;
@@ -376,7 +377,7 @@ ISR(TIMER3_COMPA_vect)
         change_dir_m = false;
     }
 
-    if (digitalRead(step_pin_m) == LOW)
+    if (current_step_state_m == false)
     {
         digitalWrite(step_pin_m, HIGH);
     }
@@ -384,4 +385,5 @@ ISR(TIMER3_COMPA_vect)
     {
         digitalWrite(step_pin_m, LOW);
     }
+    current_step_state_m ~= current_step_state_m;
 }
