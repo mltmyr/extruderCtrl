@@ -32,10 +32,10 @@ public:
         Serial.print(this->x0, DEC);
         Serial.print(", x1: ");
         Serial.print(this->x1, DEC);*/
-        Serial.print(", t0: ");
+        /*Serial.print(", t0: ");
         Serial.print(this->t0, DEC);
         Serial.print(", t1: ");
-        Serial.println(this->t1, DEC);
+        Serial.println(this->t1, DEC);*/
     }
 
     float getVal(unsigned long t)
@@ -52,7 +52,7 @@ public:
         /*Serial.print("t: ");
         Serial.print(t, DEC);
         Serial.print(", out: ");*/
-        Serial.println(out, DEC);
+        //Serial.println(out, DEC);
         
         return out;
     }
@@ -159,10 +159,14 @@ void stepper_init(byte step_pin, byte dir_pin, byte enable_pin, float process_fr
 
 
     pinMode(enable_pin_m, OUTPUT);
-    digitalWrite(enable_pin_m, HIGH);
-
     pinMode(step_pin_m,   OUTPUT);
     pinMode(dir_pin_m,    OUTPUT);
+
+    digitalWrite(enable_pin_m, HIGH);
+    digitalWrite(dir_pin_m, LOW);
+    digitalWrite(step_pin_m, HIGH);
+    delay(1);
+    digitalWrite(step_pin_m, LOW);
 
     
 
@@ -195,7 +199,7 @@ void stepper_enable()
     }
 
     digitalWrite(enable_pin_m, LOW); // Inverted => LOW is enable, HIGH is disable.
-    TIMSK3 |= (1 << OCIE3A); // Enable OC3A interrupt
+    //TIMSK3 |= (1 << OCIE3A); // Enable OC3A interrupt
     return;
 }
 
@@ -253,9 +257,9 @@ void stepWithFreq(float freq)
             break;
 
         case STANDSTILL:
+            TIMSK3 &= ~(1 << OCIE3A);
             stopTimer();
-            setOCR3A(OCR3A_MAX);
-            clearTimer();
+            //setOCR3A(OCR3A_MAX);
             current_dir_m = STANDSTILL;
             break;
 
@@ -279,9 +283,9 @@ void stepWithFreq(float freq)
             break;
 
         case STANDSTILL:
+            TIMSK3 &= ~(1 << OCIE3A);
             stopTimer();
-            setOCR3A(OCR3A_MAX);
-            clearTimer();
+            //setOCR3A(OCR3A_MAX);
             current_dir_m = STANDSTILL;
             break;
 
@@ -302,6 +306,8 @@ void stepWithFreq(float freq)
             current_dir_m = FORWARD;
             change_dir_m = true;
             setOCR3A(OCR_val);
+            clearTimer();
+            TIMSK3 |= (1 << OCIE3A);
             startTimer();
             break;
 
@@ -309,6 +315,8 @@ void stepWithFreq(float freq)
             current_dir_m = BACKWARD;
             change_dir_m = true;
             setOCR3A(OCR_val);
+            clearTimer();
+            TIMSK3 |= (1 << OCIE3A);
             startTimer();
             break;
 
@@ -383,15 +391,18 @@ void stepper_process()
 
 ISR(TIMER3_COMPA_vect)
 {
+    uint8_t old_SREG = SREG;
+    cli();
+
     if (change_dir_m == true)
     {
         if (current_dir_m == FORWARD)
         {
-            digitalWrite(dir_pin_m, HIGH);
+            digitalWrite(dir_pin_m, LOW);
         }
         else if (current_dir_m == BACKWARD)
         {
-            digitalWrite(dir_pin_m, LOW);
+            digitalWrite(dir_pin_m, HIGH);
         }
         change_dir_m = false;
     }
@@ -405,4 +416,6 @@ ISR(TIMER3_COMPA_vect)
         digitalWrite(step_pin_m, LOW);
     }
     current_step_state_m = !current_step_state_m;
+
+    SREG = old_SREG;
 }

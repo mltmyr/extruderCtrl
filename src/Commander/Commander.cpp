@@ -102,12 +102,10 @@ void Commander::execute_cmd()
         break;*/
 
     case MSG_BLINK_DEBUG_LED:
-        this->sr->println("exec blink");
         this->blink_debug_led_cb();
         break;
 
     default:
-        this->sr->println("exc_cmd error!");
         /* Should not hit. Silently ignore. */
         break;
     }
@@ -155,8 +153,6 @@ void Commander::process_byte()
 
         default:
             timesInvalidCmdRcvd = timesInvalidCmdRcvd + 1;
-            this->sr->println("proc_byte error!");
-            this->sr->println(this->cmd_code, DEC);
             break;
         }
     }
@@ -189,7 +185,6 @@ void Commander::process_incomming()
 
     while (this->sr->available() > 0)
     {
-        this->sr->println("byte rcvd!");
         this->process_byte();
     }
 

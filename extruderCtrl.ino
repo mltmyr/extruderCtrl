@@ -77,10 +77,21 @@ void set_stepping_freq(extra_bytes_t* data, byte len)
 {
   if (len == 4)
   {
-    float target_step_freq = (data->arr_f[0]);
+    /*float target_step_freq = (data->arr_f[0]);
     //stepper_setSteppingFrequency(target_step_freq);
     Serial.print("StepFreq: ");
-    Serial.println(target_step_freq);
+    Serial.println(target_step_freq);*/
+    static boolean a = false;
+    if (a == false)
+    {
+      stepper_setSteppingFrequency(-64000.0);
+      a = true;
+    }      
+    else
+    {
+      stepper_setSteppingFrequency(0.0);
+      a = false;
+    }
   }
   return;
 }
@@ -119,6 +130,10 @@ void setup()
 
   fan_ptr = new Fan(FAN_PIN);
 
+  /* ===[Stepper motor control]=== */
+  stepper_init(E_STEP_PIN, E_DIR_PIN, E_ENABLE_PIN, 4000);
+  stepper_enable();
+
   /* ===[Serial communication and command interpreter]=== */
   Serial.begin(9600, SERIAL_8N1);
   cmdr_ptr = new Commander(&Serial);
@@ -133,9 +148,6 @@ void setup()
 
   cmdr_ptr->enable();
   
-  /* ===[Stepper motor control]=== */
-  stepper_init(E_STEP_PIN, E_DIR_PIN, E_ENABLE_PIN, 50);
-  stepper_enable();
   /* ======== */
 
   LED_init_done_blink(LED_PIN);
@@ -145,23 +157,21 @@ void setup()
 boolean speedup = false;
 
 void loop()
-{
-  delay(1);
-  
+{ 
   //thrm_ptr->PeriodicReadTemp();
   //htr_ctrl_ptr->processControl();
 
   //fanControl();
 
   stepper_process();
-  
-  if ( (speedup == false) && (millis() > 10000) )
+  /*
+  if ( (speedup == false) && (millis() > 5000) )
   {
-    stepper_setSteppingFrequency(-3800.0);
+    stepper_setSteppingFrequency(-64000.0);
     speedup = true;
-  }
+  }*/
     
-  //cmdr_ptr->process_incomming();
+  cmdr_ptr->process_incomming();
 
-  //LED_process();
+  LED_process();
 }
