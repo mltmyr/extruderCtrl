@@ -5,7 +5,7 @@
 
 #define TIMER_3_PRESCALER   (8)
 #define MCU_CLOCK_FREQUENCY (16000000UL)
-#define TIMER_TICK_LENGTH   (TIMER_3_PRESCALER/MCU_CLOCK_FREQUENCY)
+#define TIMER_TICK_LENGTH   ((float)TIMER_3_PRESCALER/(float)MCU_CLOCK_FREQUENCY)
 
 class Ramper
 {
@@ -13,6 +13,10 @@ public:
     Ramper(float max_accel)
     {
         this->a_max = max_accel;
+        /*this->x0 = 0.0;
+        this->x1 = 0.0;
+        this->t0 = 0;
+        this->t1 = 0;*/
     }
 
     ~Ramper() {}
@@ -23,13 +27,21 @@ public:
         this->x0 = x0;
         this->t0 = t0;
 
-        this->t1 = (unsigned long)(abs(this->x1 - this->x0)/(this->a_max)) + this->t0;
+        this->t1 = (unsigned long)(abs(this->x1 - this->x0)/((float)(this->a_max))) + this->t0;
+        /*Serial.print("x0: ");
+        Serial.print(this->x0, DEC);
+        Serial.print(", x1: ");
+        Serial.print(this->x1, DEC);*/
+        Serial.print(", t0: ");
+        Serial.print(this->t0, DEC);
+        Serial.print(", t1: ");
+        Serial.println(this->t1, DEC);
     }
 
     float getVal(unsigned long t)
     {
         float out;
-        if (t >= this->t1)
+        if (t > this->t1)
         {
             out = (this->x1);
         }
@@ -37,6 +49,11 @@ public:
         {
             out = (this->x0)*(this->t1 - t)/(this->t1 - this->t0) + (this->x1)*(t - this->t0)/(this->t1 - this->t0);
         }
+        /*Serial.print("t: ");
+        Serial.print(t, DEC);
+        Serial.print(", out: ");*/
+        Serial.println(out, DEC);
+        
         return out;
     }
 
@@ -87,7 +104,7 @@ void stopTimer()
 void setOCR3A(unsigned long period)
 {
     OCR3AH = 0x00FF & (period >> 8);
-    OCR3AL = 0x00FF &  period;
+    OCR3AL = 0x00FF & period;
     return;
 }
 
@@ -126,21 +143,23 @@ void stepper_init(byte step_pin, byte dir_pin, byte enable_pin, float process_fr
     dir_pin_m    = dir_pin;
     current_step_state_m = digitalRead(step_pin_m);
     
-    targetSteppingFreq_m = 0;
-    steppingFreq_m       = 0;
+    targetSteppingFreq_m = 0.0;
+    steppingFreq_m       = 0.0;
 
     current_dir_m = STANDSTILL;
     change_dir_m  = false;
 
     rmpr = new Ramper(STEPPER_FREQ_ACCELERATION_MAX);
+    rmpr->targetChanged(0.0, 0.0, 0);
 
     PRR1 &= ~(1 << PRTIM3); // Enable TC3 in the Power Reduction Register 1.
 
     TCCR3A |= (1 << WGM31) | (1 << WGM30); // Operation: Fast PWM with TOP = OCR3A
     TCCR3B |= (1 << WGM33) | (1 << WGM32);
 
-    digitalWrite(enable_pin_m, HIGH);
+
     pinMode(enable_pin_m, OUTPUT);
+    digitalWrite(enable_pin_m, HIGH);
 
     pinMode(step_pin_m,   OUTPUT);
     pinMode(dir_pin_m,    OUTPUT);
@@ -385,5 +404,5 @@ ISR(TIMER3_COMPA_vect)
     {
         digitalWrite(step_pin_m, LOW);
     }
-    current_step_state_m ~= current_step_state_m;
+    current_step_state_m = !current_step_state_m;
 }

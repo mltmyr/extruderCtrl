@@ -119,10 +119,6 @@ void setup()
 
   fan_ptr = new Fan(FAN_PIN);
 
-  /* ===[Stepper motor control]=== */
-  stepper_init(E_STEP_PIN, E_DIR_PIN, E_ENABLE_PIN, 50);
-  stepper_enable();
-
   /* ===[Serial communication and command interpreter]=== */
   Serial.begin(9600, SERIAL_8N1);
   cmdr_ptr = new Commander(&Serial);
@@ -136,26 +132,36 @@ void setup()
   cmdr_ptr->blink_debug_led_cb = blink_debug_led;
 
   cmdr_ptr->enable();
+  
+  /* ===[Stepper motor control]=== */
+  stepper_init(E_STEP_PIN, E_DIR_PIN, E_ENABLE_PIN, 50);
+  stepper_enable();
   /* ======== */
-
-  stepper_setSteppingFrequency(-1.0);
 
   LED_init_done_blink(LED_PIN);
   Serial.println("Setup done!");
 }
 
+boolean speedup = false;
+
 void loop()
 {
-  delay(10);
+  delay(1);
   
-  thrm_ptr->PeriodicReadTemp();
-  htr_ctrl_ptr->processControl();
+  //thrm_ptr->PeriodicReadTemp();
+  //htr_ctrl_ptr->processControl();
 
-  fanControl();
+  //fanControl();
 
   stepper_process();
+  
+  if ( (speedup == false) && (millis() > 10000) )
+  {
+    stepper_setSteppingFrequency(-3800.0);
+    speedup = true;
+  }
     
-  cmdr_ptr->process_incomming();
+  //cmdr_ptr->process_incomming();
 
-  LED_process();
+  //LED_process();
 }
