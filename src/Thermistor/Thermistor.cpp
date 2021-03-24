@@ -87,8 +87,7 @@ float Thermistor::ReadTemp()
     float lnR_T = log(this->R_T);
     this->T = 1.0/(this->c1 + this->c2*lnR_T) - this->c3;
 
-    this->T = (float)V_mea;
-    return (float)V_mea;
+    return this->T;
 }
 
 void Thermistor::PeriodicReadTemp()
