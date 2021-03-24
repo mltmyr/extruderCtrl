@@ -47,7 +47,7 @@ void send_temp()
 
   //volatile float temp = -1.2;
 
-  Serial.println(TempCelsius, DEC);
+  Serial2.println(TempCelsius, DEC);
   //cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
   return;
 }
@@ -58,8 +58,8 @@ void set_heat_ref(extra_bytes_t* data, byte len)
   {
     float temp_ref = (data->arr_f[0]);
     //htr_ctrl_ptr->setTempRef(temp_ref);
-    Serial.print("TempRef: ");
-    Serial.println(temp_ref);
+    Serial2.print("TempRef: ");
+    Serial2.println(temp_ref);
   }
   return;
 }
@@ -138,8 +138,8 @@ void setup()
   stepper_enable();
 
   /* ===[Serial communication and command interpreter]=== */
-  Serial.begin(9600, SERIAL_8N1);
-  cmdr_ptr = new Commander(&Serial);
+  Serial2.begin(9600, SERIAL_8N1);
+  cmdr_ptr = new Commander(&Serial2);
 
   cmdr_ptr->set_extrusion_speed_cb = set_stepping_freq;
   cmdr_ptr->read_extrusion_speed_cb = sendSteppingFreq;
@@ -154,7 +154,7 @@ void setup()
   /* ======== */
 
   LED_init_done_blink(LED_PIN);
-  Serial.println("Setup done!");
+  Serial2.println("Setup done!");
 }
 
 boolean speedup = false;
