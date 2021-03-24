@@ -1,7 +1,7 @@
 #ifndef HEATER_H__
 #define HEATER_H__
 
-#include <arduino.h>
+#include <Arduino.h>
 
 class Heater
 {

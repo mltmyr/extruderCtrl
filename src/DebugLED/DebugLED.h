@@ -1,7 +1,7 @@
 #ifndef DEBUG_LED_H__
 #define DEBUG_LED_H__
 
-#include <arduino.h>
+#include <Arduino.h>
 
 void LED_startup_blink(byte led_pin);
 

@@ -1,7 +1,7 @@
 #ifndef FAN_H__
 #define FAN_H__
 
-#include <arduino.h>
+#include <Arduino.h>
 
 class Fan
 {

@@ -1,7 +1,7 @@
 #ifndef STEPPER_H__
 #define STEPPER_H__
 
-#include <arduino.h>
+#include <Arduino.h>
 
 /*#define STEP_FREQ_SIG_MIN (-3840.0)
 #define STEP_FREQ_SIG_MAX  (3840.0)*/

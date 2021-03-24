@@ -1,10 +1,10 @@
 #ifndef HEATER_CONTROL_H__
 #define HEATER_CONTROL_H__
 
-#include <arduino.h>
+#include <Arduino.h>
 
 #include "../Thermistor/Thermistor.h"
-#include "../Pid/Pid.h"
+#include "../PID/PID.h"
 #include "../Heater/Heater.h"
 
 class HeaterControl

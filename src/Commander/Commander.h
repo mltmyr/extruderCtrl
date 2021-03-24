@@ -1,14 +1,12 @@
 #ifndef COMMANDER_H__
 #define COMMANDER_H__
 
-#include <arduino.h>
+#include <Arduino.h>
 
 #define MSG_SET_HEATING             'H'
 #define MSG_SET_EXTRUSION_SPEED     'X'
 #define MSG_READ_TEMPERATURE        'T'
 #define MSG_READ_EXTRUSION_SPEED    'E'
-//#define MSG_ENABLE_EXTRUDER         'O'
-//#define MSG_DISABLE_EXTRUDER        'F'
 #define MSG_BLINK_DEBUG_LED         'B'
 
 
