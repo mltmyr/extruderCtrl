@@ -4,6 +4,7 @@
 
 #define KELVIN_AT_0_CELSIUS          (273.15)
 #define THERMISTOR_STD_CONFIG_VCC    (5.0)
+
 #define MAX_READ_FREQUENCY           (50.0)
 
 #define THERMISTOR_STD_CONFIG_R_VDIV (4700.0)
@@ -42,8 +43,8 @@ Thermistor::~Thermistor()
 
 void Thermistor::configure(Thermistor_config_t* config)
 {
-    this->c1 = 1/(config->T1) - (log(config->R_T1))/(config->B);
-    this->c2 = 1/(config->B);
+    this->c1 = 1.0/(config->T1+KELVIN_AT_0_CELSIUS) - (log(config->R_T1))/(config->B);
+    this->c2 = 1.0/(config->B);
     this->c3 = KELVIN_AT_0_CELSIUS;
 
     this->R_T = config->R_T1;
@@ -77,17 +78,12 @@ void Thermistor::setReadFreq(float read_freq)
 
 float Thermistor::ReadTemp()
 {
-    int V_mea_disc = analogRead(this->pin);
+    int disc_T = analogRead(this->pin);
     
-    //float V_mea = (THERMISTOR_STD_CONFIG_VCC - 0)*(V_mea_disc - 0)/(1023.0 - 0);
-    //float V_mea = THERMISTOR_STD_CONFIG_VCC*(V_mea_disc/1023.0);
-    //this->R_T = (this->R_vdiv)*(V_mea)/(THERMISTOR_STD_CONFIG_VCC - V_mea);
-    
-    float V_mea = V_mea_disc/1023.0;
-    this->R_T = (this->R_vdiv)*(V_mea)/(1.0 - V_mea);
-    
+    this->R_T = (this->R_vdiv) * ((float)disc_T)/((float)(1023.0 - disc_T));
+
     float lnR_T = log(this->R_T);
-    this->T = 1.0/(c1 + c2*lnR_T) - c3;
+    this->T = 1.0/(this->c1 + this->c2*lnR_T) - this->c3;
 
     return this->T;
 }
