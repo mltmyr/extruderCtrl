@@ -45,7 +45,10 @@ void send_temp()
   float TempCelsius = thrm_ptr->getTemp();
   memcpy(&(msg[1]), &TempCelsius, sizeof(TempCelsius));
 
-  cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
+  //volatile float temp = -1.2;
+
+  Serial.println(TempCelsius, DEC);
+  //cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
   return;
 }
 
@@ -158,18 +161,12 @@ boolean speedup = false;
 
 void loop()
 { 
-  //thrm_ptr->PeriodicReadTemp();
+  thrm_ptr->PeriodicReadTemp();
   //htr_ctrl_ptr->processControl();
 
-  //fanControl();
+  fanControl();
 
   stepper_process();
-  /*
-  if ( (speedup == false) && (millis() > 5000) )
-  {
-    stepper_setSteppingFrequency(-64000.0);
-    speedup = true;
-  }*/
     
   cmdr_ptr->process_incomming();
 

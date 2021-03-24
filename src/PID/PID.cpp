@@ -1,6 +1,6 @@
-#include <arduino.h>
+#include <Arduino.h>
 
-#include "Pid.h"
+#include "PID.h"
 
 Pid::Pid(pid_cfg_t* cfg)
 {

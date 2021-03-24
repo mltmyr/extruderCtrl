@@ -30,6 +30,8 @@ Thermistor::Thermistor(byte thermistor_pin, Thermistor_config_t* config, float r
 {
     this->pin = thermistor_pin;
 
+    pinMode(this->pin, INPUT);
+
     this->configure(config);
 
     this->setReadFreq(read_freq);
@@ -79,17 +81,14 @@ float Thermistor::ReadTemp()
 {
     int V_mea_disc = analogRead(this->pin);
     
-    //float V_mea = (THERMISTOR_STD_CONFIG_VCC - 0)*(V_mea_disc - 0)/(1023.0 - 0);
-    //float V_mea = THERMISTOR_STD_CONFIG_VCC*(V_mea_disc/1023.0);
-    //this->R_T = (this->R_vdiv)*(V_mea)/(THERMISTOR_STD_CONFIG_VCC - V_mea);
-    
     float V_mea = V_mea_disc/1023.0;
     this->R_T = (this->R_vdiv)*(V_mea)/(1.0 - V_mea);
     
     float lnR_T = log(this->R_T);
     this->T = 1.0/(c1 + c2*lnR_T) - c3;
 
-    return this->T;
+    this->T = (float)V_mea;
+    return (float)V_mea;
 }
 
 void Thermistor::PeriodicReadTemp()
