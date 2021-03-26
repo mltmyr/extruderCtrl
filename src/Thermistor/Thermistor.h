@@ -3,6 +3,11 @@
 
 #include <Arduino.h>
 
+#include "../GlobalConfig.h"
+
+#if USE_THERMISTOR_TABLE
+
+#else
 typedef struct
 {
     float R_vdiv; // Voltage division resistor, 4.7kOhm
@@ -42,5 +47,6 @@ private:
     unsigned long next_read_time; // in ms
 
 };
+#endif
 
 #endif /*THERMISTOR_H__*/

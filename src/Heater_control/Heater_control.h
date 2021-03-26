@@ -3,7 +3,14 @@
 
 #include <Arduino.h>
 
+#include "../GlobalConfig.h"
+
+#if USE_THERMISTOR_TABLE
+#include "../TableThermistor/TableThermistor.h"
+#else
 #include "../Thermistor/Thermistor.h"
+#endif
+
 #include "../PID/PID.h"
 #include "../Heater/Heater.h"
 

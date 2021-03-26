@@ -2,6 +2,11 @@
 
 #include <math.h>
 
+#if USE_THERMISTOR_TABLE
+
+#else
+#warning "Calculating temperature by expression!"
+
 #define KELVIN_AT_0_CELSIUS          (273.15)
 #define THERMISTOR_STD_CONFIG_VCC    (5.0)
 
@@ -111,3 +116,5 @@ float Thermistor::getTemp()
 {
     return this->T;
 }
+
+#endif

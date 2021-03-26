@@ -1,7 +1,14 @@
+#include "src/GlobalConfig.h"
 #include "src/Pins/App_Pins.h"
 #include "src/DebugLED/DebugLED.h"
 
-#include "src/Thermistor/Thermistor.h"
+#if USE_THERMISTOR_TABLE
+  #include "src/TableThermistor/TableThermistor.h"
+  #include "src/TableThermistor/thermistor_104gt_and_ramps14_table.h"
+#else
+  #include "src/Thermistor/Thermistor.h"
+#endif
+
 #include "src/PID/PID.h"
 #include "src/Heater/Heater.h"
 #include "src/Heater_control/Heater_control.h"
@@ -109,6 +116,9 @@ void setup()
   LED_startup_blink(LED_PIN);
 
   /* ===[Heating control]=== */
+#if USE_THERMISTOR_TABLE
+  thrm_ptr = new Thermistor(TEMP_0_PIN, therm_104gt_ramps14_table, therm_104gt_ramps14_table_len, 10);
+#else
   Thermistor_config_t thrm_cfg;
   thrm_cfg.R_vdiv = 4700;
   thrm_cfg.R_T1   = 100000;
@@ -116,7 +126,8 @@ void setup()
   thrm_cfg.B      = 4267;
   
   thrm_ptr = new Thermistor(TEMP_0_PIN, &thrm_cfg, 5);
-
+#endif
+  
   pid_cfg_t pid_cfg;
   pid_cfg.Kp     = 1;
   pid_cfg.Ki     = 0.1;
