@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 #include "src/GlobalConfig.h"
 #include "src/Pins/App_Pins.h"
 #include "src/DebugLED/DebugLED.h"
@@ -12,6 +14,7 @@
 #include "src/PID/PID.h"
 #include "src/Heater/Heater.h"
 #include "src/Heater_control/Heater_control.h"
+#define HEATER_CARTRIDGE_RATED_POWER 30.0
 
 #include "src/Fan/Fan.h"
 #define  FAN_TURN_ON_TEMP_THRESHOLD  50
@@ -22,6 +25,7 @@
 #include "src/Stepper/Stepper.h"
 
 #include "src/Commander/Commander.h"
+#include "src/Periodically/Periodically.h"
 
 Thermistor*    thrm_ptr;
 Pid*           thrm_pid_ptr;
@@ -30,6 +34,8 @@ HeaterControl* htr_ctrl_ptr;
 Fan*           fan_ptr;
 
 Commander*     cmdr_ptr;
+Periodically*  temp_sender_ptr;
+Periodically*  extruder_speed_sender_ptr;
 
 void fanControl()
 {
@@ -56,6 +62,29 @@ void send_temp()
 
   Serial2.println(TempCelsius, DEC);
   //cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
+  return;
+}
+
+void periodically_send_temperature(void* context, byte context_length)
+{
+  byte msg[5];
+
+  msg[0] = MSG_READ_TEMPERATURE;
+  float TempCelsius = thrm_ptr->getTemp();
+  memcpy(&(msg[1]), &TempCelsius, sizeof(TempCelsius));
+
+  cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
+  return;
+}
+
+void periodically_send_extruder_speed(void* context, byte context_length)
+{
+  byte msg[5];
+  
+  float stepFreq = stepper_getSteppingFrequency();
+  memcpy(&(msg[1]), &stepFreq, sizeof(stepFreq));
+
+  cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
   return;
 }
 
@@ -129,16 +158,16 @@ void setup()
 #endif
   
   pid_cfg_t pid_cfg;
-  pid_cfg.Kp     = 1;
-  pid_cfg.Ki     = 0.1;
-  pid_cfg.Kd     = 0.1;
+  pid_cfg.Kp     = 0.15;
+  pid_cfg.Ki     = 0.001;
+  pid_cfg.Kd     = 0;
   pid_cfg.i_sum0 = 0;
   pid_cfg.u_lim_low  = 0;
-  pid_cfg.u_lim_high = 255;
+  pid_cfg.u_lim_high = 30;
 
   thrm_pid_ptr = new Pid(&pid_cfg);
 
-  htr_ptr = new Heater(HEATER_0_PIN);
+  htr_ptr = new Heater(HEATER_0_PIN, HEATER_CARTRIDGE_RATED_POWER);
 
   htr_ctrl_ptr = new HeaterControl(thrm_ptr, thrm_pid_ptr, htr_ptr, 5);
 
@@ -160,8 +189,13 @@ void setup()
   
   cmdr_ptr->blink_debug_led_cb = blink_debug_led;
 
+  temp_sender_ptr           = new Periodically(periodically_send_temperature,    NULL, 0,  5);
+  extruder_speed_sender_ptr = new Periodically(periodically_send_extruder_speed, NULL, 0, 20);
+
   cmdr_ptr->enable();
-  
+  temp_sender_ptr->start();
+  extruder_speed_sender_ptr->start();
+
   /* ======== */
 
   LED_init_done_blink(LED_PIN);
@@ -180,6 +214,9 @@ void loop()
   stepper_process();
     
   cmdr_ptr->process_incomming();
+
+  //temp_sender_ptr->process();
+  //extruder_speed_sender_ptr->process();
 
   LED_process();
 }
