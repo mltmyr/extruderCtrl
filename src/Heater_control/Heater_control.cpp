@@ -52,7 +52,7 @@ void HeaterControl::processControl()
     long int time = millis();
     if (time >= this->next_read_time)
     {
-        /* Read temperature */
+        /* Read temperature (Celcius) */
         float temperature = this->thermistor->getTemp();
         
         /* Calculate current error in temperature */
@@ -61,8 +61,8 @@ void HeaterControl::processControl()
         /* Calculate control signal */
         float u = this->regulator->get_u(temperatureError);
 
-        /* Output control signal to heater block */
-        this->heater->setOutputHeat(round(u));
+        /* Output control signal (power) to heater block */
+        this->heater->setOutputHeat(u);
 
         /* Set next time for control calculations */
         this->next_read_time = time + this->period;
