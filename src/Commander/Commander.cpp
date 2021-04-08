@@ -5,11 +5,13 @@ void default_handler_data(extra_bytes_t* data, byte len) {return;}
 
 void Commander::init_members()
 {
-    this->set_extrusion_speed_cb  = default_handler_data;
-    this->set_heating_cb          = default_handler_data;
-    this->read_extrusion_speed_cb = default_handler_void;
-    this->read_temperature_cb     = default_handler_void;
-    this->blink_debug_led_cb      = default_handler_void;
+    this->set_extrusion_speed_cb      = default_handler_data;
+    this->set_heating_cb              = default_handler_data;
+    this->read_extrusion_speed_cb     = default_handler_void;
+    this->read_temperature_cb         = default_handler_void;
+    this->blink_debug_led_cb          = default_handler_void;
+    this->start_periodic_messaging_cb = default_handler_void;
+    this->stop_periodic_messaging_cb  = default_handler_void;
 
     this->enabled = false;
 
@@ -93,16 +95,16 @@ void Commander::execute_cmd()
         this->read_temperature_cb();
         break;
 
-    /*case MSG_ENABLE_EXTRUDER:
-        this->enable_extruder_cb();
-        break;
-
-    case MSG_DISABLE_EXTRUDER:
-        this->disable_extruder_cb();
-        break;*/
-
     case MSG_BLINK_DEBUG_LED:
         this->blink_debug_led_cb();
+        break;
+
+    case MSG_START_PERIODIC_MESSAGING:
+        this->start_periodic_messaging_cb();
+        break;
+
+    case MSG_STOP_PERIODIC_MESSAGING:
+        this->stop_periodic_messaging_cb();
         break;
 
     default:
@@ -139,15 +141,15 @@ void Commander::process_byte()
             this->numBytesRcvd = 1;
             break;
 
-        /*case MSG_ENABLE_EXTRUDER:
+        case MSG_BLINK_DEBUG_LED:
             this->numBytesRcvd = 1;
             break;
 
-        case MSG_DISABLE_EXTRUDER:
+        case MSG_START_PERIODIC_MESSAGING:
             this->numBytesRcvd = 1;
-            break;*/
+            break;
 
-        case MSG_BLINK_DEBUG_LED:
+        case MSG_STOP_PERIODIC_MESSAGING:
             this->numBytesRcvd = 1;
             break;
 

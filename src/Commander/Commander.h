@@ -3,11 +3,13 @@
 
 #include <Arduino.h>
 
-#define MSG_SET_HEATING             'H'
-#define MSG_SET_EXTRUSION_SPEED     'X'
-#define MSG_READ_TEMPERATURE        'T'
-#define MSG_READ_EXTRUSION_SPEED    'E'
-#define MSG_BLINK_DEBUG_LED         'B'
+#define MSG_SET_HEATING              'H'
+#define MSG_SET_EXTRUSION_SPEED      'X'
+#define MSG_READ_TEMPERATURE         'T'
+#define MSG_READ_EXTRUSION_SPEED     'E'
+#define MSG_BLINK_DEBUG_LED          'B'
+#define MSG_START_PERIODIC_MESSAGING 'Y'
+#define MSG_STOP_PERIODIC_MESSAGING  'N'
 
 
 
@@ -49,6 +51,8 @@ public:
     cmd_handler_void_cb enable_extruder_cb;
     cmd_handler_void_cb disable_extruder_cb;
     cmd_handler_void_cb blink_debug_led_cb;
+    cmd_handler_void_cb start_periodic_messaging_cb;
+    cmd_handler_void_cb stop_periodic_messaging_cb;
 
 private:
     void init_members();

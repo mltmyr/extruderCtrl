@@ -34,8 +34,8 @@ HeaterControl* htr_ctrl_ptr;
 Fan*           fan_ptr;
 
 Commander*     cmdr_ptr;
-Periodically*  temp_sender_ptr;
-Periodically*  extruder_speed_sender_ptr;
+Periodically*  temp_sender_ptr = nullptr;
+Periodically*  extruder_speed_sender_ptr = nullptr;
 
 void fanControl()
 {
@@ -85,6 +85,32 @@ void periodically_send_extruder_speed(void* context, byte context_length)
   memcpy(&(msg[1]), &stepFreq, sizeof(stepFreq));
 
   cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
+  return;
+}
+
+void start_periodic_messaging()
+{
+  if (temp_sender_ptr != nullptr)
+  {
+    temp_sender_ptr->start();
+  }
+  if (extruder_speed_sender_ptr != nullptr)
+  {
+    extruder_speed_sender_ptr->start();
+  }
+  return;
+}
+
+void stop_periodic_messaging()
+{
+  if (temp_sender_ptr != nullptr)
+  {
+    temp_sender_ptr->stop();
+  }
+  if (extruder_speed_sender_ptr != nullptr)
+  {
+    extruder_speed_sender_ptr->stop();
+  }
   return;
 }
 
@@ -189,12 +215,15 @@ void setup()
   
   cmdr_ptr->blink_debug_led_cb = blink_debug_led;
 
+  cmdr_ptr->start_periodic_messaging_cb = start_periodic_messaging;
+  cmdr_ptr->stop_periodic_messaging_cb = stop_periodic_messaging;
+
   temp_sender_ptr           = new Periodically(periodically_send_temperature,    NULL, 0,  5);
   extruder_speed_sender_ptr = new Periodically(periodically_send_extruder_speed, NULL, 0, 20);
 
   cmdr_ptr->enable();
-  temp_sender_ptr->start();
-  extruder_speed_sender_ptr->start();
+  //temp_sender_ptr->start();
+  //extruder_speed_sender_ptr->start();
 
   /* ======== */
 
