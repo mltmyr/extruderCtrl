@@ -45,10 +45,10 @@ float Pid::get_u(float error)
 
     if (this->u_lim_low <= this->u && this->u <= this->u_lim_high) // Stop integration when at output limits
     {
-        this->i_sum = this->i_sum + T*(this->e);
+        this->i_sum = this->i_sum + (this->I)*T*(this->e);
     }
 
-    this->u = (this->P)*(this->e) + (this->i_sum) + (this->e - this->e_prev)/T;
+    this->u = (this->P)*(this->e) + (this->i_sum) + (this->D)*(this->e - this->e_prev)/T;
 
     this->e_prev = e;
 
