@@ -37,17 +37,6 @@ Commander*     cmdr_ptr;
 Periodically*  temp_sender_ptr = nullptr;
 Periodically*  extruder_speed_sender_ptr = nullptr;
 
-void printTTable()
-{
-  for (uint8_t i = 0; i<therm_104gt_ramps14_table_len; i++)
-  {
-    Serial2.print(pgm_read_word(&therm_104gt_ramps14_table[i].value), DEC);
-    Serial2.print(", ");
-    Serial2.println(pgm_read_word(&therm_104gt_ramps14_table[i].celsius), DEC);
-  }
-  return;
-}
-
 void fanControl()
 {
   if (thrm_ptr->getTemp() >= FAN_TURN_ON_TEMP_THRESHOLD)
@@ -67,10 +56,9 @@ void send_temp()
 
   msg[0] = MSG_READ_TEMPERATURE;
   float TempCelsius = thrm_ptr->getTemp();
-  memcpy(&(msg[1]), &TempCelsius, sizeof(TempCelsius));
+  //memcpy(&(msg[1]), &TempCelsius, sizeof(TempCelsius));
 
-  //volatile float temp = -1.2;
-
+  Serial2.print("T");
   Serial2.println(TempCelsius, DEC);
   //cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
   return;
@@ -83,14 +71,10 @@ void periodically_send_temperature(void* context, byte context_length)
   msg[0] = MSG_READ_TEMPERATURE;
   float TempCelsius = thrm_ptr->getTemp();
   //memcpy(&(msg[1]), &TempCelsius, sizeof(TempCelsius));
-
+  
+  Serial2.print("T");
+  Serial2.println(TempCelsius,DEC);
   //cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
-  Serial2.print("t");
-  Serial2.print(millis());
-  Serial2.print(", T");
-  Serial2.print(TempCelsius,DEC);
-  Serial2.print(", u");
-  Serial2.println(htr_ptr->getHeatingLevel(), DEC);
   return;
 }
 
@@ -99,11 +83,11 @@ void periodically_send_extruder_speed(void* context, byte context_length)
   byte msg[5];
   
   float stepFreq = stepper_getSteppingFrequency();
-  memcpy(&(msg[1]), &stepFreq, sizeof(stepFreq));
+  //memcpy(&(msg[1]), &stepFreq, sizeof(stepFreq));
 
-  //cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
   Serial2.print("E");
   Serial2.println(stepFreq, DEC);
+  //cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
   return;
 }
 
@@ -142,13 +126,13 @@ void set_heat_ref(extra_bytes_t* data, byte len)
     //Serial2.print("TempRef: ");
     //Serial2.println(temp_ref);
     
-    /*static boolean b = false;
+    static boolean b = false;
     if (b == false)
     {
-      htr_ctrl_ptr->setTempRef(150.0);
+      htr_ctrl_ptr->setTempRef(215.0);
       b = true;
       Serial2.print("t");
-      Serial2.println(60.0,DEC);
+      Serial2.println(215.0,DEC);
     }
     else
     {
@@ -156,23 +140,7 @@ void set_heat_ref(extra_bytes_t* data, byte len)
       b = false;
       Serial2.print("t");
       Serial2.println(0.0,DEC);
-    }*/
-
-    static int cnt = -2;
-    if (cnt <= 20)
-    {
-      cnt += 2;
     }
-    else
-    {
-      cnt = 0;
-    }
-    htr_ctrl_ptr->setTempRef((float)cnt);
-    Serial2.print("t");
-    Serial2.print(millis());
-    Serial2.print(", r");
-    Serial2.println(cnt);
-    
   }
   return;
 }
