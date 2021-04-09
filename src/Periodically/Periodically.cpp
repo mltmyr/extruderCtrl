@@ -1,7 +1,7 @@
 #include "Periodically.h"
 
 #define PERIODIC_ACTION_MIN_FREQ 0.01
-#define PERIODIC_ACTION_MAX_FREQ 1000
+#define PERIODIC_ACTION_MAX_FREQ 100
 
 Periodically::Periodically(periodic_action_cb action, void* context, byte context_length, float frequency)
 {
@@ -21,19 +21,19 @@ Periodically::~Periodically()
 
 void Periodically::setFrequency(float frequency)
 {
-    if (this->period <= PERIODIC_ACTION_MIN_FREQ)
+    if (frequency <= PERIODIC_ACTION_MIN_FREQ)
     {
-        this->period = 1.0/PERIODIC_ACTION_MIN_FREQ;
+        this->period = 1000.0/PERIODIC_ACTION_MIN_FREQ;
     }
-    else if (this->period >= PERIODIC_ACTION_MAX_FREQ)
+    else if (frequency >= PERIODIC_ACTION_MAX_FREQ)
     {
-        this->period = 1.0/PERIODIC_ACTION_MAX_FREQ;
+        this->period = 1000.0/PERIODIC_ACTION_MAX_FREQ;
     }
     else
     {
-        this->period = 1.0/frequency;
+        this->period = 1000.0/frequency;
     }
-    
+
     this->next_read_time = 0;
 }
 

@@ -69,12 +69,12 @@ void Thermistor::setReadFreq(float read_freq)
     }
     else if (read_freq > MAX_READ_FREQUENCY)
     {
-        this->period = 1.0/(MAX_READ_FREQUENCY);
+        this->period = 1000.0/(MAX_READ_FREQUENCY);
         this->read_periodically = true;
     }
     else
     {
-        this->period = 1.0/read_freq;
+        this->period = 1000.0/read_freq;
         this->read_periodically = true;
     }
 

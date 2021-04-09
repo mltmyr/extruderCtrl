@@ -119,11 +119,11 @@ void setProcessFreq(float process_freq)
 {
     if (process_freq > PROCESS_RAMPING_FREQ_MAX)
     {
-        process_ramp_period_m = PROCESS_RAMPING_FREQ_MAX;
+        process_ramp_period_m = 1000.0/PROCESS_RAMPING_FREQ_MAX;
     }
     else
     {
-        process_ramp_period_m = 1.0/process_freq;
+        process_ramp_period_m = 1000.0/process_freq;
     }
 
     next_process_ramp_time_m = 0;

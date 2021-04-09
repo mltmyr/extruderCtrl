@@ -10,7 +10,7 @@
 #define STEP_FREQ_SIG_MAX  (80000.0)
 
 #define STEPPER_FREQ_ACCELERATION_MAX (400)
-#define PROCESS_RAMPING_FREQ_MAX (4000)
+#define PROCESS_RAMPING_FREQ_MAX (1000)
 
 void stepper_init(byte step_pin, byte dir_pin, byte enable_pin, float process_freq);
 void stepper_deinit();
