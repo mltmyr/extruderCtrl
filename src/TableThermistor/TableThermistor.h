@@ -29,6 +29,7 @@ private:
     const temperature_entry_t* tt;
     const uint8_t tt_len;
     float T;
+    int16_t a;
 
     float period; // in ms
     boolean read_periodically;
