@@ -17,8 +17,8 @@
 #define HEATER_CARTRIDGE_RATED_POWER 30.0
 
 #include "src/Fan/Fan.h"
-#define  FAN_TURN_ON_TEMP_THRESHOLD  50
-#define  FAN_TURN_OFF_TEMP_THRESHOLD 40
+#define  FAN_TURN_ON_TEMP_THRESHOLD  40
+#define  FAN_TURN_OFF_TEMP_THRESHOLD 35
 #define  FAN_ON  255
 #define  FAN_OFF   0
 
@@ -36,6 +36,17 @@ Fan*           fan_ptr;
 Commander*     cmdr_ptr;
 Periodically*  temp_sender_ptr = nullptr;
 Periodically*  extruder_speed_sender_ptr = nullptr;
+
+void printTTable()
+{
+  for (uint8_t i = 0; i<therm_104gt_ramps14_table_len; i++)
+  {
+    Serial2.print(pgm_read_word(&therm_104gt_ramps14_table[i].value), DEC);
+    Serial2.print(", ");
+    Serial2.println(pgm_read_word(&therm_104gt_ramps14_table[i].celsius), DEC);
+  }
+  return;
+}
 
 void fanControl()
 {
@@ -71,9 +82,15 @@ void periodically_send_temperature(void* context, byte context_length)
 
   msg[0] = MSG_READ_TEMPERATURE;
   float TempCelsius = thrm_ptr->getTemp();
-  memcpy(&(msg[1]), &TempCelsius, sizeof(TempCelsius));
+  //memcpy(&(msg[1]), &TempCelsius, sizeof(TempCelsius));
 
-  cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
+  //cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
+  Serial2.print("t");
+  Serial2.print(millis());
+  Serial2.print(", T");
+  Serial2.print(TempCelsius,DEC);
+  Serial2.print(", u");
+  Serial2.println(htr_ptr->getHeatingLevel(), DEC);
   return;
 }
 
@@ -84,7 +101,9 @@ void periodically_send_extruder_speed(void* context, byte context_length)
   float stepFreq = stepper_getSteppingFrequency();
   memcpy(&(msg[1]), &stepFreq, sizeof(stepFreq));
 
-  cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
+  //cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
+  Serial2.print("E");
+  Serial2.println(stepFreq, DEC);
   return;
 }
 
@@ -118,10 +137,42 @@ void set_heat_ref(extra_bytes_t* data, byte len)
 {
   if (len == 4)
   {
-    float temp_ref = (data->arr_f[0]);
+    //float temp_ref = (data->arr_f[0]);
     //htr_ctrl_ptr->setTempRef(temp_ref);
-    Serial2.print("TempRef: ");
-    Serial2.println(temp_ref);
+    //Serial2.print("TempRef: ");
+    //Serial2.println(temp_ref);
+    
+    /*static boolean b = false;
+    if (b == false)
+    {
+      htr_ctrl_ptr->setTempRef(150.0);
+      b = true;
+      Serial2.print("t");
+      Serial2.println(60.0,DEC);
+    }
+    else
+    {
+      htr_ctrl_ptr->setTempRef(0.0);
+      b = false;
+      Serial2.print("t");
+      Serial2.println(0.0,DEC);
+    }*/
+
+    static int cnt = -2;
+    if (cnt <= 20)
+    {
+      cnt += 2;
+    }
+    else
+    {
+      cnt = 0;
+    }
+    htr_ctrl_ptr->setTempRef((float)cnt);
+    Serial2.print("t");
+    Serial2.print(millis());
+    Serial2.print(", r");
+    Serial2.println(cnt);
+    
   }
   return;
 }
@@ -149,7 +200,7 @@ void set_stepping_freq(extra_bytes_t* data, byte len)
     static boolean a = false;
     if (a == false)
     {
-      stepper_setSteppingFrequency(-64000.0);
+      stepper_setSteppingFrequency(64000.0);
       a = true;
     }      
     else
@@ -167,7 +218,7 @@ void blink_debug_led()
 }
 
 void setup()
-{
+{  
   LED_startup_blink(LED_PIN);
 
   /* ===[Heating control]=== */
@@ -185,7 +236,7 @@ void setup()
   
   pid_cfg_t pid_cfg;
   pid_cfg.Kp     = 0.15;
-  pid_cfg.Ki     = 0.001;
+  pid_cfg.Ki     = 0.005;
   pid_cfg.Kd     = 0;
   pid_cfg.i_sum0 = 0;
   pid_cfg.u_lim_low  = 0;
@@ -200,11 +251,12 @@ void setup()
   fan_ptr = new Fan(FAN_PIN);
 
   /* ===[Stepper motor control]=== */
-  stepper_init(E_STEP_PIN, E_DIR_PIN, E_ENABLE_PIN, 4000);
+  stepper_init(E_STEP_PIN, E_DIR_PIN, E_ENABLE_PIN, 1000);
   stepper_enable();
 
   /* ===[Serial communication and command interpreter]=== */
   Serial2.begin(9600, SERIAL_8N1);
+  
   cmdr_ptr = new Commander(&Serial2);
 
   cmdr_ptr->set_extrusion_speed_cb = set_stepping_freq;
@@ -218,8 +270,8 @@ void setup()
   cmdr_ptr->start_periodic_messaging_cb = start_periodic_messaging;
   cmdr_ptr->stop_periodic_messaging_cb = stop_periodic_messaging;
 
-  temp_sender_ptr           = new Periodically(periodically_send_temperature,    NULL, 0,  5);
-  extruder_speed_sender_ptr = new Periodically(periodically_send_extruder_speed, NULL, 0, 20);
+  temp_sender_ptr           = new Periodically(periodically_send_temperature,    NULL, 0, 1);
+  //extruder_speed_sender_ptr = new Periodically(periodically_send_extruder_speed, NULL, 0, 0.5);
 
   cmdr_ptr->enable();
   //temp_sender_ptr->start();
@@ -236,7 +288,7 @@ boolean speedup = false;
 void loop()
 { 
   thrm_ptr->PeriodicReadTemp();
-  //htr_ctrl_ptr->processControl();
+  htr_ctrl_ptr->processControl();
 
   fanControl();
 
@@ -244,8 +296,8 @@ void loop()
     
   cmdr_ptr->process_incomming();
 
-  //temp_sender_ptr->process();
-  //extruder_speed_sender_ptr->process();
+  temp_sender_ptr->process();
+  extruder_speed_sender_ptr->process();
 
   LED_process();
 }
