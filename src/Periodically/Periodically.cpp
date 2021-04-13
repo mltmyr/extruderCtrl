@@ -3,7 +3,7 @@
 #define PERIODIC_ACTION_MIN_FREQ 0.01
 #define PERIODIC_ACTION_MAX_FREQ 100
 
-Periodically::Periodically(periodic_action_cb action, void* context, byte context_length, float frequency)
+Periodically::Periodically(periodic_action_cb action, void* context, uint8_t context_length, float frequency)
 {
     this->action = action;
     this->context = context;
@@ -53,7 +53,7 @@ void Periodically::process()
 {
     if (this->running == true)
     {
-        long int time = millis();
+        uint32_t time = millis();
         if (time >= this->next_read_time)
         {
             this->action(this->context, this->length);

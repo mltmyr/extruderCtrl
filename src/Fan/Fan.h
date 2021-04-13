@@ -6,16 +6,16 @@
 class Fan
 {
 public:
-    Fan(byte fan_pin);
+    Fan(uint8_t fan_pin);
     ~Fan();
-    byte getPin();
+    uint8_t getPin();
 
-    void setSpeed(byte fan_speed);
-    byte getSpeed();
+    void setSpeed(uint8_t fan_speed);
+    uint8_t getSpeed();
 
 private:
-    byte speed;
-    byte pin;
+    uint8_t speed;
+    uint8_t pin;
 };
 
 #endif /* FAN_H__ */

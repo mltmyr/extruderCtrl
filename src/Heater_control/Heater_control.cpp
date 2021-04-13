@@ -49,7 +49,7 @@ void HeaterControl::setTempRef(float ref)
 
 void HeaterControl::processControl()
 {
-    long int time = millis();
+    uint32_t time = millis();
     if (time >= this->next_read_time)
     {
         /* Read temperature (Celcius) */

@@ -3,16 +3,13 @@
 
 #include <Arduino.h>
 
-/*#define STEP_FREQ_SIG_MIN (-3840.0)
-#define STEP_FREQ_SIG_MAX  (3840.0)*/
-
 #define STEP_FREQ_SIG_MIN (-80000.0)
 #define STEP_FREQ_SIG_MAX  (80000.0)
 
 #define STEPPER_FREQ_ACCELERATION_MAX (400)
 #define PROCESS_RAMPING_FREQ_MAX (1000)
 
-void stepper_init(byte step_pin, byte dir_pin, byte enable_pin, float process_freq);
+void stepper_init(uint8_t step_pin, uint8_t dir_pin, uint8_t enable_pin, float process_freq);
 void stepper_deinit();
 
 void stepper_enable();

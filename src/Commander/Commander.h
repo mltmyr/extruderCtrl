@@ -17,13 +17,13 @@
 
 typedef union
 {
-    float arr_f[EXTRA_BYTES_BUFFER_SIZE/4];
-    word  arr_w[EXTRA_BYTES_BUFFER_SIZE/2];
-    byte  arr_b[EXTRA_BYTES_BUFFER_SIZE];
+    float    arr_f[EXTRA_BYTES_BUFFER_SIZE/4];
+    uint16_t arr_w[EXTRA_BYTES_BUFFER_SIZE/2];
+    uint8_t  arr_b[EXTRA_BYTES_BUFFER_SIZE];
 } extra_bytes_t;
 
 typedef void (*cmd_handler_void_cb)(void);
-typedef void (*cmd_handler_data_cb)(extra_bytes_t*, byte); // (data, data_length)
+typedef void (*cmd_handler_data_cb)(extra_bytes_t*, uint8_t); // (data, data_length)
 
 /* 
  * Usage:
@@ -41,7 +41,7 @@ public:
 
     void enable();
 
-    void send_msg(byte* buf, int len);
+    void send_msg(uint8_t* buf, int16_t len);
     void process_incomming();
 
     cmd_handler_data_cb set_extrusion_speed_cb;
@@ -63,14 +63,14 @@ private:
 
     boolean enabled;
 
-    byte          cmd_code;
+    uint8_t       cmd_code;
     extra_bytes_t extra_data;
 
-    byte numBytesRcvd;
-    byte numBytesTot;
+    uint8_t numBytesRcvd;
+    uint8_t numBytesTot;
 
-    int sumBytesRcvd;
-    int timesInvalidCmdRcvd;
+    int16_t sumBytesRcvd;
+    int16_t timesInvalidCmdRcvd;
 };
 
 #endif /* COMMANDER_H__ */

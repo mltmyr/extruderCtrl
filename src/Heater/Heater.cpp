@@ -1,6 +1,6 @@
 #include "Heater.h"
 
-Heater::Heater(byte heater_pin, float rated_power)
+Heater::Heater(uint8_t heater_pin, float rated_power)
 {
     this->pin = heater_pin;
     this->heater_rated_power = rated_power;
@@ -13,7 +13,7 @@ Heater::~Heater()
     analogWrite(this->pin, 0);
 }
 
-byte Heater::getPin()
+uint8_t Heater::getPin()
 {
     return this->pin;
 }
@@ -22,7 +22,7 @@ void Heater::setOutputHeat(float power)
 {
     this->heating_level = power;
 
-    analogWrite(this->pin, (byte)(this->heating_level*this->power_to_byte));
+    analogWrite(this->pin, (uint8_t)(this->heating_level*this->power_to_byte));
 }
 
 float Heater::getHeatingLevel()

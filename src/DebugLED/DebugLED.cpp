@@ -1,6 +1,6 @@
 #include "DebugLED.h"
 
-void LED_startup_blink(byte led_pin)
+void LED_startup_blink(uint8_t led_pin)
 {
     pinMode(led_pin, OUTPUT);
 
@@ -17,7 +17,7 @@ void LED_startup_blink(byte led_pin)
     return;
 }
 
-void LED_init_done_blink(byte led_pin)
+void LED_init_done_blink(uint8_t led_pin)
 {
     pinMode(led_pin, OUTPUT);
 
@@ -43,12 +43,12 @@ void LED_init_done_blink(byte led_pin)
 }
 
 #define PROCESS_LED_FREQ 10
-unsigned long next_process_time_m = 0;
+uint32_t next_process_time_m = 0;
 boolean blink_ones_m = false;
-byte blink_ones_led_pin = 0;
-byte counter_m = 0;
+uint8_t blink_ones_led_pin = 0;
+uint8_t counter_m = 0;
 
-void LED_debug_blink(byte led_pin)
+void LED_debug_blink(uint8_t led_pin)
 {
     if (blink_ones_m == true)
     {
@@ -71,7 +71,7 @@ void stop_debug_blink()
 
 void LED_process()
 {
-    unsigned long time = millis();
+    uint32_t time = millis();
     if (time >= next_process_time_m)
     {
         if (blink_ones_m == true)
@@ -94,7 +94,7 @@ void LED_process()
             
         }
         
-        next_process_time_m = time + (unsigned long)(1000.0/PROCESS_LED_FREQ);
+        next_process_time_m = time + (uint32_t)(1000.0/PROCESS_LED_FREQ);
     }
     return;
 }

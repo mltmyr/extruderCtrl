@@ -19,8 +19,8 @@ typedef struct
 class Thermistor
 {
 public:
-    Thermistor(byte thermistor_pin, float read_freq);
-    Thermistor(byte thermistor_pin, Thermistor_config_t* config, float read_freq);
+    Thermistor(uint8_t thermistor_pin, float read_freq);
+    Thermistor(uint8_t thermistor_pin, Thermistor_config_t* config, float read_freq);
     ~Thermistor();
 
     void configure(Thermistor_config_t* config);
@@ -32,7 +32,7 @@ public:
     float getTemp();
 
 private:
-    byte pin;
+    uint8_t pin;
 
     float R_T;
     float T;
@@ -44,7 +44,7 @@ private:
 
     float period; // in ms
     boolean read_periodically;
-    unsigned long next_read_time; // in ms
+    uint32_t next_read_time; // in ms
 
 };
 #endif

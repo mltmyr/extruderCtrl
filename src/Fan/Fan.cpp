@@ -2,7 +2,7 @@
 
 #include "Fan.h"
 
-Fan::Fan(byte fan_pin)
+Fan::Fan(uint8_t fan_pin)
 {
     this->pin = fan_pin;
     pinMode(this->pin, OUTPUT);
@@ -15,12 +15,12 @@ Fan::~Fan()
 
 }
 
-byte Fan::getPin()
+uint8_t Fan::getPin()
 {
     return this->pin;
 }
 
-void Fan::setSpeed(byte fan_speed)
+void Fan::setSpeed(uint8_t fan_speed)
 {
     this->speed = fan_speed;
 
@@ -29,7 +29,7 @@ void Fan::setSpeed(byte fan_speed)
     return;
 }
 
-byte Fan::getSpeed()
+uint8_t Fan::getSpeed()
 {
     return this->speed;
 }

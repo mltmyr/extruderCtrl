@@ -13,32 +13,20 @@ public:
     Ramper(float max_accel)
     {
         this->a_max = max_accel;
-        /*this->x0 = 0.0;
-        this->x1 = 0.0;
-        this->t0 = 0;
-        this->t1 = 0;*/
     }
 
     ~Ramper() {}
 
-    void targetChanged(float r, float x0, unsigned long t0)
+    void targetChanged(float r, float x0, uint32_t t0)
     {
         this->x1 = r;
         this->x0 = x0;
         this->t0 = t0;
 
-        this->t1 = (unsigned long)(abs(this->x1 - this->x0)/((float)(this->a_max))) + this->t0;
-        /*Serial.print("x0: ");
-        Serial.print(this->x0, DEC);
-        Serial.print(", x1: ");
-        Serial.print(this->x1, DEC);*/
-        /*Serial.print(", t0: ");
-        Serial.print(this->t0, DEC);
-        Serial.print(", t1: ");
-        Serial.println(this->t1, DEC);*/
+        this->t1 = (uint32_t)(abs(this->x1 - this->x0)/((float)(this->a_max))) + this->t0;
     }
 
-    float getVal(unsigned long t)
+    float getVal(uint32_t t)
     {
         float out;
         if (t > this->t1)
@@ -49,10 +37,6 @@ public:
         {
             out = (this->x0)*(this->t1 - t)/(this->t1 - this->t0) + (this->x1)*(t - this->t0)/(this->t1 - this->t0);
         }
-        /*Serial.print("t: ");
-        Serial.print(t, DEC);
-        Serial.print(", out: ");*/
-        //Serial.println(out, DEC);
         
         return out;
     }
@@ -61,8 +45,8 @@ private:
     float a_max;
     float x0;
     float x1;
-    unsigned long t0;
-    unsigned long t1;
+    uint32_t t0;
+    uint32_t t1;
 };
 
 typedef enum
@@ -74,9 +58,9 @@ typedef enum
 
 boolean stepper_is_initialized_m = false;
 
-byte enable_pin_m;
-byte   step_pin_m;
-byte    dir_pin_m;
+uint8_t enable_pin_m;
+uint8_t step_pin_m;
+uint8_t dir_pin_m;
 boolean current_step_state_m;
 float   targetSteppingFreq_m;
 float   steppingFreq_m;
@@ -86,8 +70,8 @@ boolean change_dir_m;
 
 Ramper* rmpr;
 
-float         process_ramp_period_m; // in ms
-unsigned long next_process_ramp_time_m; // in ms
+float    process_ramp_period_m; // in ms
+uint32_t next_process_ramp_time_m; // in ms
 
 void startTimer()
 {
@@ -101,7 +85,7 @@ void stopTimer()
     return;
 }
 
-void setOCR3A(unsigned long period)
+void setOCR3A(uint32_t period)
 {
     OCR3AH = 0x00FF & (period >> 8);
     OCR3AL = 0x00FF & period;
@@ -130,7 +114,7 @@ void setProcessFreq(float process_freq)
     return;
 }
 
-void stepper_init(byte step_pin, byte dir_pin, byte enable_pin, float process_freq)
+void stepper_init(uint8_t step_pin, uint8_t dir_pin, uint8_t enable_pin, float process_freq)
 {
     if (stepper_is_initialized_m == true)
     {
@@ -231,7 +215,7 @@ void stepWithFreq(float freq)
         new_dir = STANDSTILL;
     }
 
-    unsigned long OCR_val = (unsigned long)abs(1.0/(2*TIMER_TICK_LENGTH*freq));
+    uint32_t OCR_val = (uint32_t)abs(1.0/(2*TIMER_TICK_LENGTH*freq));
     if (OCR_val > OCR3A_MAX)
     {
         OCR_val = OCR3A_MAX;
@@ -376,14 +360,14 @@ void stepper_process()
         return;
     }
 
-    unsigned long time = millis();
+    uint32_t time = millis();
     if (time >= next_process_ramp_time_m)
     {
         steppingFreq_m = rmpr->getVal(time); // Get ramped stepping frequency
 
         stepWithFreq(steppingFreq_m);
 
-        next_process_ramp_time_m = time + (unsigned long)process_ramp_period_m;
+        next_process_ramp_time_m = time + (uint32_t)process_ramp_period_m;
     }
     return;
 }

@@ -52,7 +52,7 @@ void fanControl()
 
 void send_temp()
 {
-  byte msg[5];
+  uint8_t msg[5];
 
   msg[0] = MSG_READ_TEMPERATURE;
   float TempCelsius = thrm_ptr->getTemp();
@@ -60,13 +60,13 @@ void send_temp()
 
   Serial2.print("T");
   Serial2.println(TempCelsius, DEC);
-  //cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
+  //cmdr_ptr->send_msg((uint8_t*)msg, sizeof(msg));
   return;
 }
 
-void periodically_send_temperature(void* context, byte context_length)
+void periodically_send_temperature(void* context, uint8_t context_length)
 {
-  byte msg[5];
+  uint8_t msg[5];
 
   msg[0] = MSG_READ_TEMPERATURE;
   float TempCelsius = thrm_ptr->getTemp();
@@ -74,20 +74,20 @@ void periodically_send_temperature(void* context, byte context_length)
   
   Serial2.print("T");
   Serial2.println(TempCelsius,DEC);
-  //cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
+  //cmdr_ptr->send_msg((uint8_t*)msg, sizeof(msg));
   return;
 }
 
-void periodically_send_extruder_speed(void* context, byte context_length)
+void periodically_send_extruder_speed(void* context, uint8_t context_length)
 {
-  byte msg[5];
+  uint8_t msg[5];
   
   float stepFreq = stepper_getSteppingFrequency();
   //memcpy(&(msg[1]), &stepFreq, sizeof(stepFreq));
 
   Serial2.print("E");
   Serial2.println(stepFreq, DEC);
-  //cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
+  //cmdr_ptr->send_msg((uint8_t*)msg, sizeof(msg));
   return;
 }
 
@@ -117,7 +117,7 @@ void stop_periodic_messaging()
   return;
 }
 
-void set_heat_ref(extra_bytes_t* data, byte len)
+void set_heat_ref(extra_bytes_t* data, uint8_t len)
 {
   if (len == 4)
   {
@@ -147,17 +147,17 @@ void set_heat_ref(extra_bytes_t* data, byte len)
 
 void sendSteppingFreq()
 {
-  byte msg[5];
+  uint8_t msg[5];
 
   msg[0] = MSG_READ_EXTRUSION_SPEED;
   float stepFreq = stepper_getSteppingFrequency();
   memcpy(&(msg[1]), &stepFreq, sizeof(stepFreq));
 
-  cmdr_ptr->send_msg((byte*)msg, sizeof(msg));
+  cmdr_ptr->send_msg((uint8_t*)msg, sizeof(msg));
   return;
 }
 
-void set_stepping_freq(extra_bytes_t* data, byte len)
+void set_stepping_freq(extra_bytes_t* data, uint8_t len)
 {
   if (len == 4)
   {

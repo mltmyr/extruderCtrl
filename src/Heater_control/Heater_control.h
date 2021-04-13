@@ -32,8 +32,8 @@ private:
 
     float temperatureReference;
 
-    float period; // in ms
-    unsigned long next_read_time; // in ms
+    float    period; // in ms
+    uint32_t next_read_time; // in ms
 };
 
 #endif /* HEATER_CONTROL_H__ */

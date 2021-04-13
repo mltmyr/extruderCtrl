@@ -5,7 +5,7 @@
 
 #define MAX_READ_FREQUENCY           (50.0)
 
-Thermistor::Thermistor(byte thermistor_pin, const temperature_entry_t thermistor_table[], const uint8_t thermistor_table_length, float read_freq)
+Thermistor::Thermistor(uint8_t thermistor_pin, const temperature_entry_t thermistor_table[], const uint8_t thermistor_table_length, float read_freq)
     : pin(thermistor_pin), T(0), tt(thermistor_table), tt_len(thermistor_table_length)
 {
     this->setReadFreq(read_freq);
@@ -92,7 +92,7 @@ void Thermistor::PeriodicReadTemp()
         return;
     }
 
-    unsigned long time = millis();
+    uint32_t time = millis();
     if (time >= this->next_read_time)
     {
         this->ReadTemp();

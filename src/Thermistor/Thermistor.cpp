@@ -18,7 +18,7 @@
 #define THERMISTOR_STD_CONFIG_B      (4267)
 
 
-Thermistor::Thermistor(byte thermistor_pin, float read_freq)
+Thermistor::Thermistor(uint8_t thermistor_pin, float read_freq)
 {
     this->pin = thermistor_pin;
 
@@ -32,7 +32,7 @@ Thermistor::Thermistor(byte thermistor_pin, float read_freq)
     this->setReadFreq(read_freq);
 }
 
-Thermistor::Thermistor(byte thermistor_pin, Thermistor_config_t* config, float read_freq)
+Thermistor::Thermistor(uint8_t thermistor_pin, Thermistor_config_t* config, float read_freq)
 {
     this->pin = thermistor_pin;
 

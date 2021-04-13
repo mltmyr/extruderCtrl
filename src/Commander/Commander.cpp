@@ -1,7 +1,7 @@
 #include "Commander.h"
 
 void default_handler_void() {return;}
-void default_handler_data(extra_bytes_t* data, byte len) {return;}
+void default_handler_data(extra_bytes_t* data, uint8_t len) {return;}
 
 void Commander::init_members()
 {
@@ -19,7 +19,7 @@ void Commander::init_members()
     this->numBytesTot  = 1;
 
     this->cmd_code = 0x00;
-    for (int i = 0; i < EXTRA_BYTES_BUFFER_SIZE; i++) {this->extra_data.arr_b[i] = 0x00;}
+    for (uint16_t i = 0; i < EXTRA_BYTES_BUFFER_SIZE; i++) {this->extra_data.arr_b[i] = 0x00;}
 
     this->sumBytesRcvd = 0;
     this->timesInvalidCmdRcvd = 0;
@@ -62,7 +62,7 @@ void Commander::enable()
     return;
 }
 
-void Commander::send_msg(byte* buf, int len)
+void Commander::send_msg(uint8_t* buf, int16_t len)
 {
     if (this->enabled == false)
     {

@@ -3,12 +3,12 @@
 
 #include <Arduino.h>
 
-typedef void (*periodic_action_cb)(void*, byte);
+typedef void (*periodic_action_cb)(void*, uint8_t);
 
 class Periodically
 {
 public:
-    Periodically(periodic_action_cb action, void* context, byte context_length, float frequency);
+    Periodically(periodic_action_cb action, void* context, uint8_t context_length, float frequency);
     ~Periodically();
 
     void setFrequency(float frequency);
@@ -19,11 +19,11 @@ public:
 private:
     periodic_action_cb action;
     void* context;
-    byte length;
+    uint8_t length;
     boolean running;
 
-    float period; // in ms
-    unsigned long next_read_time; // in ms
+    float    period; // in ms
+    uint32_t next_read_time; // in ms
 };
 
 #endif /* PERIODICALLY_H__ */

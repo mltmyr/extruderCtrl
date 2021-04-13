@@ -34,8 +34,8 @@ private:
     float e;
     float e_prev;
 
-    unsigned long t;
-    unsigned long t_prev;
+    uint32_t t;
+    uint32_t t_prev;
 
     float u;
 };
