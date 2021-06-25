@@ -48,8 +48,6 @@ public:
     cmd_handler_data_cb set_heating_cb;
     cmd_handler_void_cb read_extrusion_speed_cb;
     cmd_handler_void_cb read_temperature_cb;
-    cmd_handler_void_cb enable_extruder_cb;
-    cmd_handler_void_cb disable_extruder_cb;
     cmd_handler_void_cb blink_debug_led_cb;
     cmd_handler_void_cb start_periodic_messaging_cb;
     cmd_handler_void_cb stop_periodic_messaging_cb;
