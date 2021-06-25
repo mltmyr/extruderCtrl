@@ -27,6 +27,8 @@
 #include "src/Commander/Commander.h"
 #include "src/Periodically/Periodically.h"
 
+#define SERIAL_MODULE Serial
+
 Thermistor*    thrm_ptr;
 Pid*           thrm_pid_ptr;
 Heater*        htr_ptr;
@@ -58,8 +60,8 @@ void send_temp()
   float TempCelsius = thrm_ptr->getTemp();
   //memcpy(&(msg[1]), &TempCelsius, sizeof(TempCelsius));
 
-  Serial2.print("T");
-  Serial2.println(TempCelsius, DEC);
+  SERIAL_MODULE.print("T");
+  SERIAL_MODULE.println(TempCelsius, DEC);
   //cmdr_ptr->send_msg((uint8_t*)msg, sizeof(msg));
   return;
 }
@@ -72,8 +74,8 @@ void periodically_send_temperature(void* context, uint8_t context_length)
   float TempCelsius = thrm_ptr->getTemp();
   //memcpy(&(msg[1]), &TempCelsius, sizeof(TempCelsius));
   
-  Serial2.print("T");
-  Serial2.println(TempCelsius,DEC);
+  SERIAL_MODULE.print("T");
+  SERIAL_MODULE.println(TempCelsius,DEC);
   //cmdr_ptr->send_msg((uint8_t*)msg, sizeof(msg));
   return;
 }
@@ -85,8 +87,8 @@ void periodically_send_extruder_speed(void* context, uint8_t context_length)
   float stepFreq = stepper_getSteppingFrequency();
   //memcpy(&(msg[1]), &stepFreq, sizeof(stepFreq));
 
-  Serial2.print("E");
-  Serial2.println(stepFreq, DEC);
+  SERIAL_MODULE.print("E");
+  SERIAL_MODULE.println(stepFreq, DEC);
   //cmdr_ptr->send_msg((uint8_t*)msg, sizeof(msg));
   return;
 }
@@ -131,15 +133,15 @@ void set_heat_ref(extra_bytes_t* data, uint8_t len)
     {
       htr_ctrl_ptr->setTempRef(215.0);
       b = true;
-      Serial2.print("t");
-      Serial2.println(215.0,DEC);
+      SERIAL_MODULE.print("t");
+      SERIAL_MODULE.println(215.0,DEC);
     }
     else
     {
       htr_ctrl_ptr->setTempRef(0.0);
       b = false;
-      Serial2.print("t");
-      Serial2.println(0.0,DEC);
+      SERIAL_MODULE.print("t");
+      SERIAL_MODULE.println(0.0,DEC);
     }
   }
   return;
@@ -223,9 +225,9 @@ void setup()
   stepper_enable();
 
   /* ===[Serial communication and command interpreter]=== */
-  Serial2.begin(9600, SERIAL_8N1);
+  SERIAL_MODULE.begin(9600, SERIAL_8N1);
   
-  cmdr_ptr = new Commander(&Serial2);
+  cmdr_ptr = new Commander(&SERIAL_MODULE);
 
   cmdr_ptr->set_extrusion_speed_cb = set_stepping_freq;
   cmdr_ptr->read_extrusion_speed_cb = sendSteppingFreq;
@@ -248,7 +250,7 @@ void setup()
   /* ======== */
 
   LED_init_done_blink(LED_PIN);
-  Serial2.println("Setup done!");
+  SERIAL_MODULE.println("Setup done!");
 }
 
 boolean speedup = false;
