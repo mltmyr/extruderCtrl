@@ -58,11 +58,12 @@ void send_temp()
 
   msg[0] = MSG_READ_TEMPERATURE;
   float TempCelsius = thrm_ptr->getTemp();
-  //memcpy(&(msg[1]), &TempCelsius, sizeof(TempCelsius));
-
-  SERIAL_MODULE.print("T");
-  SERIAL_MODULE.println(TempCelsius, DEC);
-  //cmdr_ptr->send_msg((uint8_t*)msg, sizeof(msg));
+  
+  memcpy(&(msg[1]), &TempCelsius, sizeof(TempCelsius));
+  cmdr_ptr->send_msg((uint8_t*)msg, sizeof(msg));
+  
+  //SERIAL_MODULE.print("T");
+  //SERIAL_MODULE.println(TempCelsius, DEC);
   return;
 }
 
@@ -72,11 +73,12 @@ void periodically_send_temperature(void* context, uint8_t context_length)
 
   msg[0] = MSG_READ_TEMPERATURE;
   float TempCelsius = thrm_ptr->getTemp();
-  //memcpy(&(msg[1]), &TempCelsius, sizeof(TempCelsius));
-  
-  SERIAL_MODULE.print("T");
-  SERIAL_MODULE.println(TempCelsius,DEC);
-  //cmdr_ptr->send_msg((uint8_t*)msg, sizeof(msg));
+
+  memcpy(&(msg[1]), &TempCelsius, sizeof(TempCelsius));
+  cmdr_ptr->send_msg((uint8_t*)msg, sizeof(msg));
+
+  //SERIAL_MODULE.print("T");
+  //SERIAL_MODULE.println(TempCelsius,DEC);
   return;
 }
 
@@ -85,11 +87,11 @@ void periodically_send_extruder_speed(void* context, uint8_t context_length)
   uint8_t msg[5];
   
   float stepFreq = stepper_getSteppingFrequency();
-  //memcpy(&(msg[1]), &stepFreq, sizeof(stepFreq));
+  memcpy(&(msg[1]), &stepFreq, sizeof(stepFreq));
+  cmdr_ptr->send_msg((uint8_t*)msg, sizeof(msg));
 
-  SERIAL_MODULE.print("E");
-  SERIAL_MODULE.println(stepFreq, DEC);
-  //cmdr_ptr->send_msg((uint8_t*)msg, sizeof(msg));
+  //SERIAL_MODULE.print("E");
+  //SERIAL_MODULE.println(stepFreq, DEC);
   return;
 }
 
@@ -123,12 +125,12 @@ void set_heat_ref(extra_bytes_t* data, uint8_t len)
 {
   if (len == 4)
   {
-    //float temp_ref = (data->arr_f[0]);
-    //htr_ctrl_ptr->setTempRef(temp_ref);
+    float temp_ref = (data->arr_f[0]);
+    htr_ctrl_ptr->setTempRef(temp_ref);
     //Serial2.print("TempRef: ");
     //Serial2.println(temp_ref);
     
-    static boolean b = false;
+    /*static boolean b = false;
     if (b == false)
     {
       htr_ctrl_ptr->setTempRef(215.0);
@@ -142,7 +144,7 @@ void set_heat_ref(extra_bytes_t* data, uint8_t len)
       b = false;
       SERIAL_MODULE.print("t");
       SERIAL_MODULE.println(0.0,DEC);
-    }
+    }*/
   }
   return;
 }
@@ -153,8 +155,8 @@ void sendSteppingFreq()
 
   msg[0] = MSG_READ_EXTRUSION_SPEED;
   float stepFreq = stepper_getSteppingFrequency();
+  
   memcpy(&(msg[1]), &stepFreq, sizeof(stepFreq));
-
   cmdr_ptr->send_msg((uint8_t*)msg, sizeof(msg));
   return;
 }
@@ -163,11 +165,12 @@ void set_stepping_freq(extra_bytes_t* data, uint8_t len)
 {
   if (len == 4)
   {
-    /*float target_step_freq = (data->arr_f[0]);
-    //stepper_setSteppingFrequency(target_step_freq);
-    Serial.print("StepFreq: ");
-    Serial.println(target_step_freq);*/
-    static boolean a = false;
+    float target_step_freq = (data->arr_f[0]);
+    stepper_setSteppingFrequency(target_step_freq);
+    //Serial.print("StepFreq: ");
+    //Serial.println(target_step_freq);
+    
+    /*static boolean a = false;
     if (a == false)
     {
       stepper_setSteppingFrequency(64000.0);
@@ -177,7 +180,7 @@ void set_stepping_freq(extra_bytes_t* data, uint8_t len)
     {
       stepper_setSteppingFrequency(0.0);
       a = false;
-    }
+    }*/
   }
   return;
 }
@@ -189,7 +192,7 @@ void blink_debug_led()
 
 void setup()
 {  
-  LED_startup_blink(LED_PIN);
+  //LED_startup_blink(LED_PIN);
 
   /* ===[Heating control]=== */
 #if USE_THERMISTOR_TABLE
@@ -241,19 +244,17 @@ void setup()
   cmdr_ptr->stop_periodic_messaging_cb = stop_periodic_messaging;
 
   temp_sender_ptr           = new Periodically(periodically_send_temperature,    NULL, 0, 1);
-  //extruder_speed_sender_ptr = new Periodically(periodically_send_extruder_speed, NULL, 0, 0.5);
+  extruder_speed_sender_ptr = new Periodically(periodically_send_extruder_speed, NULL, 0, 0.5);
 
   cmdr_ptr->enable();
-  //temp_sender_ptr->start();
-  //extruder_speed_sender_ptr->start();
-
+  start_periodic_messaging();
   /* ======== */
 
-  LED_init_done_blink(LED_PIN);
+  //LED_init_done_blink(LED_PIN);
   SERIAL_MODULE.println("Setup done!");
 }
 
-boolean speedup = false;
+//boolean speedup = false;
 
 void loop()
 { 
