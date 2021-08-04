@@ -91,7 +91,8 @@ void sendSteppingFreq()
 void periodically_send_extruder_speed(void* context, uint8_t context_length)
 {
   uint8_t msg[5];
-  
+
+  msg[0] = MSG_READ_EXTRUSION_SPEED;
   float stepFreq = stepper_getSteppingFrequency();
   memcpy(&(msg[1]), &stepFreq, sizeof(stepFreq));
   
@@ -200,8 +201,8 @@ void setup()
   
   cmdr_ptr->blink_debug_led_cb = blink_debug_led;
 
-  cmdr_ptr->start_periodic_messaging_cb = start_periodic_messaging;
-  cmdr_ptr->stop_periodic_messaging_cb = stop_periodic_messaging;
+  //cmdr_ptr->start_periodic_messaging_cb = start_periodic_messaging;
+  //cmdr_ptr->stop_periodic_messaging_cb = stop_periodic_messaging;
 
   temp_sender_ptr           = new Periodically(periodically_send_temperature,    NULL, 0, 1);
   extruder_speed_sender_ptr = new Periodically(periodically_send_extruder_speed, NULL, 0, 0.5);
