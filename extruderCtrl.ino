@@ -27,7 +27,7 @@
 #include "src/Commander/Commander.h"
 #include "src/Periodically/Periodically.h"
 
-#define SERIAL_MODULE Serial
+#define SERIAL_MODULE Serial2
 
 Thermistor*    thrm_ptr;
 Pid*           thrm_pid_ptr;
