@@ -75,20 +75,27 @@ uint32_t next_process_ramp_time_m; // in ms
 
 void startTimer()
 {
-    TCCR3B |= (0 << CS32) | (1 << CS31) | (0 << CS30); // Enable timer with prescaler 8.
+    TCCR3B = (0b11111000 & TCCR3B) | (0b00000111 & 0b010); // Enable timer with prescaler 8.
     return;
 }
 
 void stopTimer()
 {
-    TCCR3B |= (0 << CS32) | (0 << CS31) | (0 << CS30); // Disable timer.
+    TCCR3B = (0b11111000 & TCCR3B) | (0b00000111 & 0b000); // Disable timer.
     return;
 }
 
 void setOCR3A(uint32_t period)
 {
-    OCR3AH = 0x00FF & (period >> 8);
-    OCR3AL = 0x00FF & period;
+	uint8_t old_SREG;
+
+	old_SREG = SREG;
+	cli();
+
+	OCR3A = period;
+
+	SREG = old_SREG;
+
     return;
 }
 
@@ -137,10 +144,9 @@ void stepper_init(uint8_t step_pin, uint8_t dir_pin, uint8_t enable_pin, float p
     rmpr->targetChanged(0.0, 0.0, 0);
 
     PRR1 &= ~(1 << PRTIM3); // Enable TC3 in the Power Reduction Register 1.
-
+    TCCR3B = 0x00;
     TCCR3A |= (1 << WGM31) | (1 << WGM30); // Operation: Fast PWM with TOP = OCR3A
     TCCR3B |= (1 << WGM33) | (1 << WGM32);
-
 
     pinMode(enable_pin_m, OUTPUT);
     pinMode(step_pin_m,   OUTPUT);
